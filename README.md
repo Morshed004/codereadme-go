@@ -18,7 +18,7 @@ The **CodeReadMe Generator** is a tool that automates the process of generating 
 Make sure to have Go installed on your machine. Clone the repository and install the necessary dependencies:
 
 ```bash
-git clone github.com/Morshed004/codereadme-go
+git clone https://github.com/Morshed004/codereadme-go.git
 cd codereadme-go
 go mod tidy
 ```
