@@ -10,7 +10,7 @@
 - **Safety First**: Automatically creates a `README.old.md` backup if an existing README is detected before updating.
 - **Clean Architecture**: Organized into internal packages for scanning, parsing, generation, and writing.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Language**: [Go](https://go.dev/) (v1.26.3)
 - **API**: [OpenRouter](https://openrouter.ai/)
