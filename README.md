@@ -1,56 +1,87 @@
-# CodeReadMe Generator
+# CodeREADME
 
-## Description
-The **CodeReadMe Generator** is a tool that automates the process of generating a professional README.md file for codebases. By analyzing the structure and content of the existing code files, the generator creates a well-organized README that includes essential sections such as project title, description, features, tech stack, installation instructions, usage information, folder structure, and suggested future improvements.
+**CodeREADME** is a CLI tool written in Go that automatically generates professional `README.md` files for your projects. It scans your local codebase, compiles the relevant source files, and leverages the power of Large Language Models (LLMs) via the OpenRouter API to document your project structure, features, and usage.
 
 ## Features
-- **Automated README Generation**: Generates a README.md file based on the contents of the codebase.
-- **Configurable Ignoring Patterns**: Supports ignoring certain files or directories based on user-defined patterns in the `.codereadmeignore` file.
-- **OpenRouter AI Integration**: Utilizes OpenRouter API to dynamically generate text based on the analyzed code.
-- **Backup Existing README**: Automatically creates a backup of any existing README.md file before updates.
 
-## Tech Stack
-- **Go**: The primary programming language used for the project.
-- **OpenRouter API**: For generating content using the OpenAI GPT model.
-- **Go modules**: For dependency management.
+- **Automated Codebase Scanning**: Recursively walks through your directory to collect source code.
+- **Smart Ignoring**: Supports a `.codereadmeignore` file to exclude binaries, dependencies, and sensitive files from being sent to the LLM.
+- **LLM Integration**: Uses OpenRouter (specifically configured for `google/gemma-4-31b-it:free`) to generate high-quality, context-aware documentation.
+- **Safety First**: Automatically creates a `README.old.md` backup if an existing README is detected before updating.
+- **Clean Architecture**: Organized into internal packages for scanning, parsing, generation, and writing.
+
+## 🛠 Tech Stack
+
+- **Language**: [Go](https://go.dev/) (v1.26.3)
+- **API**: [OpenRouter](https://openrouter.ai/)
+- **Environment Management**: `godotenv`
 
 ## Installation
-Make sure to have Go installed on your machine. Clone the repository and install the necessary dependencies:
 
-```bash
-git clone https://github.com/Morshed004/codereadme-go.git
-cd codereadme-go
-go mod tidy
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Morshed004/codereadme-go.git
+   cd codereadme-go
+   ```
 
-### Environment Setup
-Create an `.env` file in the root of the project with the following content:
+2. **Install dependencies**:
+   ```bash
+   go mod tidy
+   ```
 
-```
-OPENROUTER_API_KEY=<your_api_key_here>
-```
+3. **Configure Environment**:
+   Create a `.env` file in the root directory and add your OpenRouter API key:
+   ```env
+   OPENROUTER_API_KEY=your_api_key_here
+   ```
 
-Replace `<your_api_key_here>` with your actual API key for OpenRouter.
+4. **Build the application**:
+   ```bash
+   go build -o codereadme main.go
+   ```
 
 ## Usage
-Run the application to generate the `README.md` file:
-```bash
-go run main.go generate
+
+### 1. Set up Ignore List
+Create a `.codereadmeignore` file to prevent unnecessary files (like `.git`, `node_modules`, or `.env`) from being uploaded to the API:
+```text
+.git
+.env
+mod.sum
+*.exe
 ```
-The tool will scan the current directory (and subdirectories) for code files and generate a `README.md` file based on its content.
+
+### 2. Generate the README
+Run the following command in the root of the project you wish to document:
+```bash
+./codereadme generate
+```
+
+**What happens next?**
+- The tool scans your directory.
+- It constructs a prompt containing your code.
+- It calls the OpenRouter API.
+- It saves the result as `README.md` (and backups the old one if it exists).
 
 ## Folder Structure
-```
-/Project Root
-├── .env                     # Environment variables
-├── go.mod                   # Module dependencies
-├── go.sum                   # Module checksums
-├── main.go                  # Application entry point
+
+```text
+.
 ├── internal/
-│   ├── generator/           # Logic for generating README
-│   ├── openrouter/          # Client for OpenRouter API
-│   ├── parser/              # Functions to build prompts for the API
-│   ├── scanner/             # Scanning logic to read code files
-│   └── writer/              # Functions to save README.md
-└── .codereadmeignore        # Files and directories to ignore
+│   ├── generator/    # Orchestrates the flow between scanner, parser, and writer
+│   │   └── readme.go
+│   ├── openrouter/    # Handles HTTP communication with the OpenRouter API
+│   │   └── client.go
+│   ├── parser/        # Formats the scanned files into a structured LLM prompt
+│   │   └── parser.go
+│   ├── scanner/       # Logic for walking the file system and handling ignore patterns
+│   │   ├── ignore.go
+│   │   ├── matcher.go
+│   │   └── scanner.go
+│   └── writer/        # Handles file writing and backup logic
+│       └── file.go
+├── .env               # Environment variables (API Keys)
+├── .codereadmeignore  # Files to exclude from scanning
+├── go.mod             # Go module definition
+└── main.go            # CLI Entry point
 ```
