@@ -1,87 +1,80 @@
-# CodeREADME
+# CodeReadme  
 
-**CodeREADME** is a CLI tool written in Go that automatically generates professional `README.md` files for your projects. It scans your local codebase, compiles the relevant source files, and leverages the power of Large Language Models (LLMs) via the OpenRouter API to document your project structure, features, and usage.
+A command‑line tool that scans a source repository and generates a natural‑language README.md using the OpenRouter AI service.
 
-## Features
+## Overview  
+CodeReadme walks the current directory, reads all source files (respecting a `.codereadmeignore` file), builds a prompt describing the project, sends it to OpenRouter, and writes the resulting documentation to `README.md`. It can create a new README or update an existing one.
 
-- **Automated Codebase Scanning**: Recursively walks through your directory to collect source code.
-- **Smart Ignoring**: Supports a `.codereadmeignore` file to exclude binaries, dependencies, and sensitive files from being sent to the LLM.
-- **LLM Integration**: Uses OpenRouter (specifically configured for `google/gemma-4-31b-it:free`) to generate high-quality, context-aware documentation.
-- **Safety First**: Automatically creates a `README.old.md` backup if an existing README is detected before updating.
-- **Clean Architecture**: Organized into internal packages for scanning, parsing, generation, and writing.
+## Features  
+- Scans a Go module or any directory tree.  
+- Ignores files listed in `.codereadmeignore`.  
+- Generates a README via the OpenRouter API (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`).  
+- Writes or updates `README.md` in the project root.  
+- Reads the OpenRouter API key from the `OPENROUTER_API_KEY` environment variable (or a `.env` file).  
 
-## Tech Stack
+## Tech Stack  
+- **Language:** Go 1.26  
+- **Dependencies:**  
+  - `github.com/joho/godotenv` – loads environment variables from a `.env` file.  
+- **Internal packages:**  
+  - `scanner` – file discovery and ignore‑pattern handling.  
+  - `parser` – builds the prompt from the scanned files.  
+  - `writer` – creates or updates `README.md`.  
+  - `openrouter` – HTTP client that calls the OpenRouter API.  
 
-- **Language**: [Go](https://go.dev/) (v1.26.3)
-- **API**: [OpenRouter](https://openrouter.ai/)
-- **Environment Management**: `godotenv`
+## Installation  
+1. Ensure Go 1.26 or newer is installed.  
+2. Clone the repository.  
+3. (Optional) Create a `.env` file in the project root with:  
 
-## Installation
+   ```
+   OPENROUTER_API_KEY=sk-or-v1-<your‑key>
+   ```
 
-1. **Clone the repository**:
+   The key value itself is **not** documented; only the variable name is required.  
+
+4. Build or run directly:  
+
    ```bash
-   git clone https://github.com/Morshed004/codereadme-go.git
-   cd codereadme-go
+   go run ./...
    ```
 
-2. **Install dependencies**:
-   ```bash
-   go mod tidy
-   ```
+   The binary will be placed in the current directory or can be installed with `go install`.
 
-3. **Configure Environment**:
-   Create a `.env` file in the root directory and add your OpenRouter API key:
-   ```env
-   OPENROUTER_API_KEY=your_api_key_here
-   ```
+## Usage  
+Run the tool with the `generate` command:
 
-4. **Build the application**:
-   ```bash
-   go build -o codereadme main.go
-   ```
-
-## Usage
-
-### 1. Set up Ignore List
-Create a `.codereadmeignore` file to prevent unnecessary files (like `.git`, `node_modules`, or `.env`) from being uploaded to the API:
-```text
-.git
-.env
-mod.sum
-*.exe
-```
-
-### 2. Generate the README
-Run the following command in the root of the project you wish to document:
 ```bash
-./codereadme generate
+codereadme generate
 ```
 
-**What happens next?**
-- The tool scans your directory.
-- It constructs a prompt containing your code.
-- It calls the OpenRouter API.
-- It saves the result as `README.md` (and backups the old one if it exists).
+The tool will read the codebase, contact OpenRouter, and write (or replace) `README.md` in the project root. If `README.md` already exists, a backup named `README.old.md` is created before overwriting.
 
-## Folder Structure
+## Project Structure  
 
-```text
+```
 .
+├── .codereadmeignore      # optional file listing paths to ignore
+├── go.mod                 # module definition
+├── go.sum                 # Go module checksums
+├── main.go                # entry point
 ├── internal/
-│   ├── generator/    # Orchestrates the flow between scanner, parser, and writer
-│   │   └── readme.go
-│   ├── openrouter/    # Handles HTTP communication with the OpenRouter API
-│   │   └── client.go
-│   ├── parser/        # Formats the scanned files into a structured LLM prompt
-│   │   └── parser.go
-│   ├── scanner/       # Logic for walking the file system and handling ignore patterns
-│   │   ├── ignore.go
-│   │   ├── matcher.go
-│   │   └── scanner.go
-│   └── writer/        # Handles file writing and backup logic
-│       └── file.go
-├── .env               # Environment variables (API Keys)
-├── .codereadmeignore  # Files to exclude from scanning
-├── go.mod             # Go module definition
-└── main.go            # CLI Entry point
+│   ├── generator/         # orchestrates scanning, prompt building, API call, and file write
+│   ├── scanner/           # discovers files and applies ignore patterns
+│   ├── parser/            # builds the prompt from file contents
+│   ├── writer/            # handles README creation / update
+│   └── openrouter/        # HTTP client for OpenRouter API
+└── README.md              # generated documentation (updated by the tool)
 ```
+
+## Configuration  
+The only required configuration is the `OPENROUTER_API_KEY` environment variable. It should contain a valid OpenRouter API key. If the variable is not set, the tool aborts with a clear error message.
+
+A `.env` file can be used to supply the variable automatically; its content is read by `godotenv`.
+
+## Notes  
+- The tool respects the `.codereadmeignore` file for file inclusion/exclusion, mirroring the behavior of `.gitignore`.  
+- No internal implementation details are exposed to the end user; the README generation logic is encapsulated within the `generator` package.  
+- Errors from the OpenRouter API (e.g., authentication failures, rate limits) are propagated as human‑readable messages.
+
+*Generated by CodeReadme.*
