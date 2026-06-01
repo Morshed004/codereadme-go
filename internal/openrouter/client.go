@@ -11,7 +11,7 @@ import (
 func Generate(prompt, apiKey string) (string, error) {
 
 	body := map[string]interface{}{
-		"model": "google/gemma-4-31b-it:free",
+		"model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
 		"messages": []map[string]string{
 			{
 				"role":    "user",
