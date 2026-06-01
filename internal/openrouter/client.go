@@ -11,7 +11,7 @@ import (
 func Generate(prompt, apiKey string) (string, error) {
 
 	body := map[string]interface{}{
-		"model": "openai/gpt-4o-mini",
+		"model": "google/gemma-4-31b-it:free",
 		"messages": []map[string]string{
 			{
 				"role":    "user",
