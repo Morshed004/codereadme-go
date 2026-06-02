@@ -5,13 +5,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func Generate(prompt, apiKey string) (string, error) {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Can not load env")
+	}
 
 	body := map[string]interface{}{
-		"model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+		"model": os.Getenv("AI_MODEL"),
 		"messages": []map[string]string{
 			{
 				"role":    "user",
@@ -24,7 +31,7 @@ func Generate(prompt, apiKey string) (string, error) {
 
 	req, err := http.NewRequest(
 		"POST",
-		"https://openrouter.ai/api/v1/chat/completions",
+		os.Getenv("API_ENDPOINT"),
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {

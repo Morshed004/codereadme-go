@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"codereadme/internal/generator"
@@ -25,9 +26,9 @@ func main() {
 	switch command {
 
 	case "generate":
-		apiKey := os.Getenv("OPENROUTER_API_KEY")
+		apiKey := os.Getenv("API_KEY")
 		if apiKey == "" {
-			fmt.Println("OPENROUTER_API_KEY not set")
+			fmt.Println("API_KEY not set")
 			return
 		}
 
@@ -38,7 +39,7 @@ func main() {
 
 		err = generator.Generate(files, apiKey)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		fmt.Println("✅ README.md generated")

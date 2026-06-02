@@ -10,7 +10,7 @@ CodeReadme walks the current directory, reads all source files (respecting a `.c
 - Ignores files listed in `.codereadmeignore`.  
 - Generates a README via the OpenRouter API (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`).  
 - Writes or updates `README.md` in the project root.  
-- Reads the OpenRouter API key from the `OPENROUTER_API_KEY` environment variable (or a `.env` file).  
+- Reads the API key from the `API_KEY` environment variable (or a `.env` file).  
 
 ## Tech Stack  
 - **Language:** Go 1.26  
