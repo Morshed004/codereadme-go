@@ -1,4 +1,4 @@
-package openrouter
+package llm
 
 import (
 	"bytes"
@@ -56,17 +56,17 @@ func Generate(prompt, apiKey string) (string, error) {
 
 	// HANDLE API ERROR PROPERLY
 	if errMsg, ok := result["error"]; ok {
-		return "", fmt.Errorf("openrouter error: %v", errMsg)
+		return "", fmt.Errorf("LLM error: %v", errMsg)
 	}
 
 	choices, ok := result["choices"]
 	if !ok || choices == nil {
-		return "", errors.New("no choices returned from OpenRouter (check API key or model)")
+		return "", errors.New("no choices returned from LLM (check API key or model)")
 	}
 
 	choicesArr, ok := choices.([]interface{})
 	if !ok || len(choicesArr) == 0 {
-		return "", errors.New("invalid choices format from OpenRouter")
+		return "", errors.New("invalid choices format from LLM")
 	}
 
 	first := choicesArr[0].(map[string]interface{})
